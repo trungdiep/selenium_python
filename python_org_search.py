@@ -19,25 +19,23 @@ driver.get(url)
 dri = webdriver.Firefox()
 dri.implicitly_wait(30)
 
-#After opening the url above, Selenium clicks the specific agency link
-# python_button = driver.find_element_by_id('MainContent_uxLevel1_Agencies_uxAgencyBtn_33') #FHSU
-# python_button.click() #click fhsu link
-
-#Selenium hands the page source to Beautiful Soup
-# python_button = driver.find_element_by_id('MainContent_uxLevel1_Agencies_uxAgencyBtn_33') #FHSU
-# python_button.click() #click fhsu link
 html = driver.page_source
 soup = BeautifulSoup(html,"html.parser")
-for div in soup.select('.info ,.bg-white'):
-    u = "https://www.casio.com/"+div.a['href']
-    # dri.get(u)
-    r = requests.get(url=u)
-    s = BeautifulSoup(r.content,"html.parser")
+div_content_body = soup.find('div',{'class':'contents-body'})
 
-    # html_source = html = dri.page_source
-    # print(html_source)
-    print(s.title)
+div_products = div_content_body.find_all("div",{'class':"info bg-white"})
+with open('context.html', 'w+') as f:
+   for div in div_products:
+       f.write(div.a['href']+"\n")
 
+with open('context.html', 'r+') as f:
+    links_product = f.read()
+list_links = list()
+for link in links_product.split('\n'):
+    list_links.append("https://www.casio.com" + link)
+
+reponse = requests.get(list_links[0])
+print(reponse.content)
 driver.close()
 
 
