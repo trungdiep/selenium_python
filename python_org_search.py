@@ -7,6 +7,7 @@ from tabulate import tabulate
 import os
 import requests
 import json
+from bs4_canio_case1 import get_detail_product_watch_casio
 
 #launch url
 url = "https://www.casio.com/products/watches/baby-g"
@@ -31,11 +32,17 @@ with open('context.html', 'w+') as f:
 with open('context.html', 'r+') as f:
     links_product = f.read()
 list_links = list()
-for link in links_product.split('\n'):
-    list_links.append("https://www.casio.com" + link)
 
-reponse = requests.get(list_links[0])
-print(reponse.content)
+for link in links_product.split('\n'):
+    if link is not "":
+        # list_links.append("https://www.casio.com" + link)
+        url = "https://www.casio.com" + link
+        print(url)
+        get_detail_product_watch_casio(url)
+        
+print("done")
+# reponse = requests.get(list_links[0])
+# print(reponse.content)
 driver.close()
 
 
