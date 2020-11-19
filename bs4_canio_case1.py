@@ -3,18 +3,18 @@ import json
 from bs4 import BeautifulSoup
 import shutil # to save it locally
 import os
+import time
 
-
-
-url_product = "https://www.casio.com/products/watches/baby-g/bg169m-4"
+# url_product = "https://www.casio.com/products/watches/baby-g/bg169m-4"
+url_product = "https://www.casio.com/products/watches/g-shock/ga900a-1a9"
 
 def get_detail_product_watch_casio(url_product):
     r = requests.get(url=url_product)
-
+    time.sleep(2)
+    
     soul = BeautifulSoup(r.content,'html.parser')
     div_name = soul.find("div",{'class':'name'})
     name_product = div_name.h2.text
-    # price_product = soul.find("div",{'class':'price'}).text.split()[1]
     if os.path.exists(name_product+'.json'):
         return
     raw_price_product = soul.find("div",{'class':'price'}).text.split()
@@ -22,6 +22,10 @@ def get_detail_product_watch_casio(url_product):
     price_product = None
     if raw_price_product != [] and raw_price_product is not None:
         price_product = soul.find("div",{'class':'price'}).text.split()[1]
+
+    new_product = False
+    if soul.find("mark") is not None:
+        new_product = True
 
     div_spec_icons = soul.find('div',{'class':"spec-icons"})
     list_spec_icon = list()
@@ -39,15 +43,13 @@ def get_detail_product_watch_casio(url_product):
 
 
     div_swiper_wrapper = soul.find('div',{'class':'swiper-wrapper'})
-    list_imgs_product = list()
-    for div in div_swiper_wrapper.find_all('div'):
-        list_imgs_product.append("http:"+div["data-img-narrow"])
-
+    list_images_product = list()
+    for div in div_swiper_wrapper.find_all('div',{"class":"swiper-slide js-zoom zoom"}):
+        list_images_product.append("http:"+div["data-img-narrow"])
     path_product = os.path.join("img",name_product)
     if os.path.exists(path_product) is False:
         os.mkdir(path_product)
-
-        for img in list_imgs_product:
+        for img in list_images_product:
             filename = img.split('/')[-1]
             path_filename = os.path.join(path_product,filename)
             r = requests.get(url=img, stream=True)
@@ -58,8 +60,13 @@ def get_detail_product_watch_casio(url_product):
             # Open a local file with wb ( write binary ) permission.
                 with open(path_filename,'wb+') as f:
                     shutil.copyfileobj(r.raw, f)
+    else:
+        return
+    if soul.find("div",{"class":"js-cont-wrap"}).p is not None:
+        introduce_product = soul.find("div",{"class":"js-cont-wrap"}).p.text
+    elif soul.find("div",{"class":"js-cont-wrap"}).text :
+        introduce_product = soul.find("div",{"class":"js-cont-wrap"}).text
 
-    introduce_product = soul.find("div",{"class":"js-cont-wrap"}).p.text
     dict_product = dict()
 
     div_category_products = soul.find("div",{"class":"grid-1 grid-w--1"})
@@ -85,7 +92,6 @@ def get_detail_product_watch_casio(url_product):
         for figure in list_color_variation_img:
             list_product_together_color.append(figure.a['href'])
 
-        # print(list_product_together_color)
 
     dict_product["category_product"] = category_product
     dict_product["introduce_product"] = introduce_product
@@ -95,8 +101,10 @@ def get_detail_product_watch_casio(url_product):
     dict_product["url_product"] = url_product
     dict_product["list_specification_product"] = list_specification_product
     dict_product["list_product_together_color"] = list_product_together_color
-    with open(name_product+".json",'w+') as target:
-        target.write(json.dumps(dict_product))
+    dict_product["new_product"] = new_product
+    # with open(name_product+".json",'w+') as target:
+    #     target.write(json.dumps(dict_product))
 
+    return dict_product
 
-get_detail_product_watch_casio(url_product)
+# print(get_detail_product_watch_casio(url_product))

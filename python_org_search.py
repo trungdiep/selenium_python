@@ -7,11 +7,12 @@ from tabulate import tabulate
 import os
 import requests
 import json
+import asyncio
 from bs4_canio_case1 import get_detail_product_watch_casio
 
 #launch url
 url = "https://www.casio.com/products/watches/baby-g"
-# url = "https://www.casio.com/products/watches/baby-g/ba112-1a"
+# url = "https://www.casio.com/products/watches/g-shock"
 # # create a new Firefox session
 driver = webdriver.Firefox()
 driver.implicitly_wait(30)
@@ -38,11 +39,12 @@ for link in links_product.split('\n'):
         # list_links.append("https://www.casio.com" + link)
         url = "https://www.casio.com" + link
         print(url)
-        get_detail_product_watch_casio(url)
-        
+        list_links.append(get_detail_product_watch_casio(url))
+
+with open('g-shock.json', 'w+') as target:
+    target.write(json.dumps(list_links))
+
 print("done")
-# reponse = requests.get(list_links[0])
-# print(reponse.content)
 driver.close()
 
 
