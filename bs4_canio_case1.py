@@ -62,12 +62,13 @@ def get_detail_product_watch_casio(url_product):
                     shutil.copyfileobj(r.raw, f)
     else:
         return
+
+    introduce_product = None
     if soul.find("div",{"class":"js-cont-wrap"}).p is not None:
         introduce_product = soul.find("div",{"class":"js-cont-wrap"}).p.text
     elif soul.find("div",{"class":"js-cont-wrap"}).text :
         introduce_product = soul.find("div",{"class":"js-cont-wrap"}).text
 
-    dict_product = dict()
 
     div_category_products = soul.find("div",{"class":"grid-1 grid-w--1"})
     ol_category_products = div_category_products.find('ol')
@@ -92,7 +93,7 @@ def get_detail_product_watch_casio(url_product):
         for figure in list_color_variation_img:
             list_product_together_color.append(figure.a['href'])
 
-
+    dict_product = dict()
     dict_product["category_product"] = category_product
     dict_product["introduce_product"] = introduce_product
     dict_product["list_spec_icon"] = list_spec_icon
@@ -102,9 +103,10 @@ def get_detail_product_watch_casio(url_product):
     dict_product["list_specification_product"] = list_specification_product
     dict_product["list_product_together_color"] = list_product_together_color
     dict_product["new_product"] = new_product
+    dict_product["path_image"] = path_product
     # with open(name_product+".json",'w+') as target:
     #     target.write(json.dumps(dict_product))
 
-    return dict_product
+    return dict_product, "done"
 
 # print(get_detail_product_watch_casio(url_product))

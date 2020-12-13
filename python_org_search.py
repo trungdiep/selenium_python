@@ -1,25 +1,22 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
-import re
 import pandas as pd
 from tabulate import tabulate
-import os
-import requests
 import json
-import asyncio
 from bs4_canio_case1 import get_detail_product_watch_casio
 
+PATH = "C:\Program Files (x86)\chromedriver.exe"
+
 #launch url
-url = "https://www.casio.com/products/watches/baby-g"
+# url = "https://www.casio.com/products/watches/baby-g"
 # url = "https://www.casio.com/products/watches/g-shock"
+url = "https://www.casio.com/products/watches/g-shock-women"
 # # create a new Firefox session
-driver = webdriver.Firefox()
+driver = webdriver.Chrome(PATH)
 driver.implicitly_wait(30)
 driver.get(url)
 
-dri = webdriver.Firefox()
-dri.implicitly_wait(30)
 
 html = driver.page_source
 soup = BeautifulSoup(html,"html.parser")
