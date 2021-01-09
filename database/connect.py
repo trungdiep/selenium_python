@@ -4,7 +4,7 @@ import psycopg2
 from configparser import ConfigParser
 
 
-def config(filename='database/database.ini', section='postgresql'):
+def config(filename=r'/home/kali/Documents/python/selenium_python/database/database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -17,40 +17,46 @@ def config(filename='database/database.ini', section='postgresql'):
         for param in params:
             db[param[0]] = param[1]
     else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+        raise Exception(
+            'Section {0} not found in the {1} file'.format(section, filename))
 
     return db
+
+command = """
+    CREATE TABLE baby_g (
+        ID_WATCHES INTEGER,
+        category_product VARCHAR(50), 
+        introduce_product TEXT NOT NULL, 
+        price_product MONEY NOT NULL,  
+        name_product VARCHAR(20) NOT NULL, 
+        url_product VARCHAR(200) NOT NULL,
+        list_specification_product TEXT[] NOT NULL,
+        list_product_together_color TEXT[] NOT NULL,
+        new_product BOOLEAN NOT NULL )
+    """
 
 def connect():
     """ Connect to the PostgreSQL database server """
     conn = None
     try:
-        # read connection parameters
+        # read the connection parameters
         params = config()
-
         # connect to the PostgreSQL server
-        print('Connecting to the PostgreSQL database...')
         conn = psycopg2.connect(**params)
-		
-        # create a cursor
         cur = conn.cursor()
-        
-	# execute a statement
-        print('PostgreSQL database version:')
-        cur.execute('CREATE TABLE BABY-G')
-
-        # display the PostgreSQL database server version
-        db_version = cur.fetchone()
-        print(db_version)
-       
-	# close the communication with the PostgreSQL
+        # create table one by one
+        # for command in commands:
+        cur.execute(command)
+        # close communication with the PostgreSQL database server
         cur.close()
+        # commit the changes
+        conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     finally:
         if conn is not None:
             conn.close()
-            print('Database connection closed.')
+            print("Donel")
 
 
 if __name__ == '__main__':
