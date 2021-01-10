@@ -6,19 +6,19 @@ import os
 from concurrent import futures
 from detail_watch import(get_price, get_highlight_info, download_image, get_introduct_watch,
                          get_code_watch, get_list_specification_product, get_color_variations)
-
+from database.connect import connect
 
 # url_product = "https://www.casio.com/products/watches/baby-g/bg169m-4"
 # url_product = "https://www.casio.com/products/watches/g-shock-women/msgs500g-1a"
 
-def get_list_product_crawl(dict_product):
 
-    return list_product
 
 def get_detail_product_watch_casio(fut: futures):
     context_request = fut.result()
     soul = BeautifulSoup(context_request, 'html.parser')
     
+    url_product = soul.find("meta",{"property":"og:url"})["content"]
+
     #name watch
     div_name = soul.find("div", {'class': 'name'})
     name_product = div_name.h2.text
@@ -59,20 +59,13 @@ def get_detail_product_watch_casio(fut: futures):
     dict_product["list_spec_icon"] = list_highlight_info
     dict_product["price_product"] = price_product
     dict_product["name_product"] = name_product
+    dict_product["url_product"] = url_product
     dict_product["list_specification_product"] = list_specification_product
     dict_product["list_product_together_color"] = list_product_same_color
     dict_product["new_product"] = new_product
     dict_product["path_image"] = path_image_product
 
-
+    print(dict_product)
     # list_product_crawl = get_list_product_crawl(dict_product)
-    list_product_crawl = list()
-    if not os.path.isfile("data_crawl/g-shock-women.json"):
-        with open("data_crawl/g-shock-women.json", 'r') as target:
-            context_file = target.read()
-        if context_file != "":
-            list_product = json.loads(context_file)
-    list_product_crawl.append(dict_product)
 
-    with open("data_crawl/g-shock-women.json", 'w+') as target:
-        json.dump(list_product_crawl, target, indent=4)
+    connect(dict_product)
